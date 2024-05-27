@@ -43,8 +43,7 @@ contract PodcastCore is IERC721Receiver {
     mapping (address => IpDetails) internal ipIdDetails;
     IpDetails[] internal ipDetails;
 
-    event remixRequest(address indexed ipOwner, uint256 requestedLtAmount, address indexed recipient, string message);
-    event remixPermissionGranted(address indexed ipId, uint256 ltAmount, address indexed recipient, string message);
+    event remixPermissionGranted(address indexed ipId, address indexed recipient, uint256 startLicenseTokenId);
 
     constructor(address ipAssetRegistry,address licensingModule, address pilTemplate, address royaltymodule, address iproyaltyvault, address royaltypolicylap) {
         IP_ASSET_REGISTRY = IPAssetRegistry(ipAssetRegistry);
@@ -62,12 +61,21 @@ contract PodcastCore is IERC721Receiver {
     /// @return ipId The address of the IP Account
     /// @return tokenId The token ID of the IP NFT
 
-    function mintUniqueIp(string memory uri) external returns (address ipId, uint256 tokenId) {
+    function registerandLicenseforUniqueIP(string memory uri,address ltRecipient) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
         tokenId = STORYPOD_NFT.safeMint(address(this), uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
         //commercial license with remix royalty, so 3
-        LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
+        LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 2);
         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+         startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
+            licensorIpId: ipId,
+            licenseTemplate: address(PIL_TEMPLATE),
+            licenseTermsId: 2,
+            amount: 1,
+            receiver: ltRecipient,
+            royaltyContext: "" 
+        });
+        emit remixPermissionGranted(ipId, ltRecipient, startLicenseTokenId);
         ipDetails.push(IpDetails(
             tokenId,
             ipId
@@ -78,53 +86,27 @@ contract PodcastCore is IERC721Receiver {
         );
     }
     
-
-    function requestRemixFromIPOwner(address ipId, uint256 ltAmount, string memory message) external {
-        emit remixRequest(owner(ipIdDetails[ipId].tokenId), ltAmount, msg.sender, message);
-    }
-
-    /// @notice Mint License tokens to the recipient who wants to remix your content.
-    ///@param ipId The address of the IP Account
-    /// @param ltAmount amount of license token to be minted
-    /// @param  ltRecipient address of the recipient whom you grant the license to remix
-    /// @param message a short message to the recipient
-    /// @return startLicenseTokenId
-
-    function mintLicenseTokenForUniqueIP(address ipId ,uint256 ltAmount,address ltRecipient, string memory message) 
-    external returns (uint256 startLicenseTokenId)
-    {
-        startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
-            licensorIpId: ipId,
-            licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 3,
-            amount: ltAmount,
-            receiver: ltRecipient,
-            royaltyContext: "" 
-        });
-        emit remixPermissionGranted(ipId, ltAmount, ltRecipient, message);
-    }
+    
 
     ///@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
 
 
     function registerAndMintTokenForRemixIP(
-        uint256 ltAmount,
-        address ltRecipient,string memory uri
-    ) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
+        uint256 licenseTokenId, string memory uri
+    ) external returns (address ipId, uint256 tokenId) {
         
         address current = address(this);
         tokenId =  STORYPOD_NFT.safeMint(current,uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
 
-        LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 3);
+        uint256[] memory licenseTokenIds = new uint256[](1);
+        licenseTokenIds[0] = licenseTokenId;
 
-        startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
-            licensorIpId: ipId,
-            licenseTemplate: address(PIL_TEMPLATE),
-            licenseTermsId: 3,
-            amount: ltAmount,
-            receiver: ltRecipient,
-            royaltyContext: "" 
+        LICENSING_MODULE.registerDerivativeWithLicenseTokens({
+            childIpId: ipId,
+            licenseTokenIds: licenseTokenIds,
+            royaltyContext: ""
+
         });
          STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
          ipDetails.push(IpDetails(
@@ -175,8 +157,8 @@ contract PodcastCore is IERC721Receiver {
         userNames[msg.sender] = _userName;
     }
 
-    function getUserName() public view returns (string memory) {
-        string memory userName = userNames[msg.sender];
+    function getUserName(address user) public view returns (string memory) {
+        string memory userName = userNames[user];
         require(bytes(userName).length > 0, "Username is not set");
         return userName;
     }
@@ -202,4 +184,3 @@ contract PodcastCore is IERC721Receiver {
     }
 
     }
-
