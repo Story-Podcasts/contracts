@@ -4,16 +4,15 @@ pragma solidity 0.8.23;
 
 import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import {ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 // @notice mint nft of your episodes here before registering IP
 
-contract StoryPod is ERC721, ERC721URIStorage, Ownable {
+contract StoryPod is ERC721, ERC721URIStorage {
     uint256 private _nextTokenId;
 
-    constructor(address initialOwner) ERC721("R1NFT" , "R1") Ownable(initialOwner)
+    constructor() ERC721("R1NFT" , "R1")
     {}
 
-    function safeMint(address to, string memory uri) public onlyOwner returns (uint256){
+    function safeMint(address to, string memory uri) public returns (uint256){
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);

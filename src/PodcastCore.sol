@@ -53,7 +53,7 @@ contract PodcastCore is IERC721Receiver {
         IPROYALTYVAULT = IpRoyaltyVault(iproyaltyvault);
       ROYALTYPOLICYLAP = RoyaltyPolicyLAP(royaltypolicylap);
        TIP_TOKEN = IERC20(tiptoken);
-        STORYPOD_NFT = new StoryPod(address(this));
+        STORYPOD_NFT = new StoryPod();
     }
 
     /// @notice Mint an IP NFT, register it as an IP Account and attach license terms via Story Protocol core.
@@ -64,7 +64,7 @@ contract PodcastCore is IERC721Receiver {
     function registerandLicenseforUniqueIP(string memory uri,address ltRecipient) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
         tokenId = STORYPOD_NFT.safeMint(address(this), uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
-        //commercial license with remix royalty, so 3
+        //keeping non-commercial for MVP
         LICENSING_MODULE.attachLicenseTerms(ipId, address(PIL_TEMPLATE), 2);
         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
          startLicenseTokenId = LICENSING_MODULE.mintLicenseTokens({
@@ -92,23 +92,9 @@ contract PodcastCore is IERC721Receiver {
 
 
     function registerAndMintTokenForRemixIP(
-        uint256 licenseTokenId, string memory uri
-    ) external returns (address ipId, uint256 tokenId) {
-        
-        address current = address(this);
-        tokenId =  STORYPOD_NFT.safeMint(current,uri);
-        ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
-
-        uint256[] memory licenseTokenIds = new uint256[](1);
-        licenseTokenIds[0] = licenseTokenId;
-
-        LICENSING_MODULE.registerDerivativeWithLicenseTokens({
-            childIpId: ipId,
-            licenseTokenIds: licenseTokenIds,
-            royaltyContext: ""
-
-        });
-         STORYPOD_NFT.transferFrom(address(this), msg.sender, tokenId);
+        uint256 tokenId, address ipId
+    ) external {
+        // everything else done on the frontend
          ipDetails.push(IpDetails(
             tokenId,
             ipId
