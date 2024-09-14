@@ -4,28 +4,28 @@
 
 "@openzeppelin/contracts-upgradeable-v4@npm:@openzeppelin/contracts-upgradeable@4.9.6":
   version "4.9.6"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.9.6.tgz"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.9.6.tgz#38b21708a719da647de4bb0e4802ee235a0d24df"
   integrity sha512-m4iHazOsOCv1DgM7eD7GupTJ+NFVujRZt1wzddDPSVGpWdKq1SKkla5htKG7+IS4d2XOCtzkUNwRZ7Vq5aEUMA==
 
 "@openzeppelin/contracts-upgradeable@^5.0.2":
   version "5.0.2"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.2.tgz"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-5.0.2.tgz#3e5321a2ecdd0b206064356798c21225b6ec7105"
   integrity sha512-0MmkHSHiW2NRFiT9/r5Lu4eJq5UJ4/tzlOgYXNAIj/ONkQTVnz22pLxDvp4C4uZ9he7ZFvGn3Driptn1/iU7tQ==
 
-"@openzeppelin/contracts@^5.0.2", "@openzeppelin/contracts@5.0.2":
+"@openzeppelin/contracts@^5.0.2":
   version "5.0.2"
-  resolved "https://registry.npmjs.org/@openzeppelin/contracts/-/contracts-5.0.2.tgz"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-5.0.2.tgz#b1d03075e49290d06570b2fd42154d76c2a5d210"
   integrity sha512-ytPc6eLGcHHnapAZ9S+5qsdomhjo6QBHTDRRBFfTxXIpsicMhVPouPgmUPebZZZGX7vt9USA+Z+0M0dSVtSUEA==
 
 "ds-test@https://github.com/dapphub/ds-test":
   version "1.0.0"
-  resolved "git+ssh://git@github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
+  resolved "https://github.com/dapphub/ds-test#e282159d5170298eb2455a6c05280ab5a73a4ef0"
 
 erc6551@^0.3.1:
   version "0.3.1"
-  resolved "https://registry.npmjs.org/erc6551/-/erc6551-0.3.1.tgz"
+  resolved "https://registry.yarnpkg.com/erc6551/-/erc6551-0.3.1.tgz#f9ccc0901c210b0cc29c1c730398878319a1fd30"
   integrity sha512-4+O7CJ5gn3/s2Mum1QiJDJUbGE1P1m0t3do2nnFAKWEXLubWfZjS12HqraUJ6Y6su3WJ8EqdWm0270gC0bqpCA==
 
 "forge-std@github:foundry-rs/forge-std#v1.7.6":
   version "1.7.6"
-  resolved "git+ssh://git@github.com/foundry-rs/forge-std.git#ae570fec082bfe1c1f45b0acca4a2b4f84d345ce"
+  resolved "https://codeload.github.com/foundry-rs/forge-std/tar.gz/ae570fec082bfe1c1f45b0acca4a2b4f84d345ce"

@@ -7,13 +7,13 @@ import {ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions
 // @notice mint nft of your episodes here before registering IP
 
 contract StoryPod is ERC721, ERC721URIStorage {
-    uint256 private _nextTokenId;
+    uint256 public nextTokenId;
 
-    constructor() ERC721("R1NFT" , "R1")
+    constructor() ERC721("StoryPods" , "SP")
     {}
 
     function safeMint(address to, string memory uri) public returns (uint256){
-        uint256 tokenId = _nextTokenId++;
+        uint256 tokenId = nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         return tokenId;

@@ -31,7 +31,7 @@ contract PodcastCore is IERC721Receiver {
     IpRoyaltyVault public immutable IPROYALTYVAULT;
      IERC20 public immutable TIP_TOKEN;
     StoryPod public immutable STORYPOD_NFT;
-    address immutable tiptoken = 0xB132A6B7AE652c974EE1557A3521D53d18F6739f;
+    address immutable tiptoken = 0x91f6F05B08c16769d3c85867548615d270C42fC7; //Story USD
     
 
    struct IpDetails {
@@ -61,7 +61,7 @@ contract PodcastCore is IERC721Receiver {
     /// @return ipId The address of the IP Account
     /// @return tokenId The token ID of the IP NFT
 
-    function registerandLicenseforUniqueIP(string memory uri,address ltRecipient) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
+    function registerandLicense(string memory uri,uint256 ltAmount,address ltRecipient,bool original) external returns (address ipId, uint256 tokenId, uint256 startLicenseTokenId) {
         tokenId = STORYPOD_NFT.safeMint(address(this), uri);
         ipId = IP_ASSET_REGISTRY.register(block.chainid, address(STORYPOD_NFT), tokenId);
         //keeping non-commercial for MVP
@@ -71,25 +71,27 @@ contract PodcastCore is IERC721Receiver {
             licensorIpId: ipId,
             licenseTemplate: address(PIL_TEMPLATE),
             licenseTermsId: 2,
-            amount: 1,
+            amount: ltAmount,        
             receiver: ltRecipient,
             royaltyContext: "" 
         });
-        emit remixPermissionGranted(ipId, ltRecipient, startLicenseTokenId);
-        ipDetails.push(IpDetails(
-            tokenId,
-            ipId
-        ));
-        ipIdDetails[ipId] = IpDetails(
-            tokenId,
-            ipId
-        );
+
+        if(original)
+        { // orignal IP registered, licensed
+        emit originalIPRLicensed(ipId, ltRecipient, startLicenseTokenId);
+        }
+        else
+        {
+            emit RemixedIPRLicensed(ipId, ltRecipient, startLicenseTokenId);
+        }
+
+        ipDetails.push(IpDetails(tokenId,ipId));
+        ipIdDetails[ipId] = IpDetails(tokenId,ipId);
     }
     
     
 
-    ///@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
-
+    /*@notice Remix IP :Register a derived episode IP NFT and mint License Tokens
 
     function registerAndMintTokenForRemixIP(
         uint256 tokenId, address ipId
@@ -104,24 +106,16 @@ contract PodcastCore is IERC721Receiver {
             ipId
         );
     }
-
-
-
+*/
     //---Royalty----//
   
      function mintTipToken(address to, uint256 amount) external {
         TIP_TOKEN.mint(to, amount);
     }
 
-    function tipEpisode(address ipId, uint256 amount) external payable {
+    function tipEpisode(address to,address payerIpId,address token, uint256 amount) external payable {
         require(amount > 0, "Please tip more than zero");
-        require(TIP_TOKEN.approve(address(this), amount), "Token approval failed");
-        require(TIP_TOKEN.transferFrom(msg.sender, address(this), amount), "Token transfer failed");
-        require(TIP_TOKEN.approve(address(ROYALTY_MODULE), amount), "Token approval failed");
-        ROYALTY_MODULE.payRoyaltyOnBehalf(ipId,
-         address(0),//user doesn't have ipid
-         tiptoken,
-         amount);
+        ROYALTY_MODULE.payRoyaltyOnBehalf(to,address(0), token, amount);//if fails try standard non-zero payerIPID
     }
 
     function collectFirstRoyalty(address ipId) external payable
